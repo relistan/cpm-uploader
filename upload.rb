@@ -1,10 +1,17 @@
 #!/usr/bin/env ruby
 
+# This tool is used to upload files to CP/M machines attached to the serial
+# port. It assumes you are already in CP/M and in the path where you want to
+# upload the file.
+#
+# Karl Matthias -- April 2022
+
 require 'optimist'
 require 'serialport'
 
 READ_BLOCK_SIZE = 30
-DEFAULT_DEVICE='/dev/cu.usbserial-FTDOMLSO'
+DEFAULT_DEVICE = '/dev/cu.usbserial-FTDOMLSO'
+SEND_DELAY = 0.03 # Seconds
 
 opts = Optimist::options do
   opt :download_path, 'Path to DOWNLOAD.COM on CP/M', type: :string, default: 'A:DOWNLOAD'
@@ -31,7 +38,7 @@ end
 
 def port_write(port, buf)
   port.write(buf)
-  sleep(0.03) # Make sure not to overrun serial buffer
+  sleep(SEND_DELAY) # Make sure not to overrun serial buffer
 end
 
 unless File.exists?(opts[:file])
@@ -70,6 +77,6 @@ end
 # Output the closing statement
 port.puts ">#{byte_count.to_s(16).upcase}#{checksum.to_s(16).upcase}"
 
-sleep(0.1)
+sleep(0.1) # Just enough time for final output
 infile.close
 port.close

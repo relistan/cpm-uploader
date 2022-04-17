@@ -31,6 +31,13 @@ how 99% of terminals will be set, I did not break them out.
 This works great on my macOS machine running at 115200. It works just fine with
 `minicom` running in another terminal as well.
 
+Installation
+------------
+
+You only need to have Ruby installed (most systems do already). Then just run
+`gem install bundler` if you don't have bundler. Then `bundle install`. Then
+you are ready to go.
+
 Running It
 ----------
 
