@@ -4,7 +4,7 @@ READ_BLOCK_SIZE = 30
 
 require 'optimist'
 opts = Optimist::options do
-  opt :download_path, 'Path to DOWNLOAD.COM on CP/M', type: :string, default: 'A:DOWNLOAD.COM'
+  opt :download_path, 'Path to DOWNLOAD.COM on CP/M', type: :string, default: 'A:DOWNLOAD'
   opt :file, 'File to upload', type: :string, short: 'f', required: true
   opt :user, 'The CP/M user ID to upload to', type: :integer, default: 0
 end
@@ -39,6 +39,6 @@ while (buf = infile.read(READ_BLOCK_SIZE)) do
 end
 
 # Output the closing statement
-puts ">#{byte_count}#{checksum}"
+puts ">#{byte_count.to_s(16).upcase}#{checksum.to_s(16).upcase}"
 
 infile.close
