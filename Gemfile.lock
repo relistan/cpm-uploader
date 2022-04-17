@@ -1,0 +1,15 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    optimist (3.0.1)
+    serialport (1.3.2)
+
+PLATFORMS
+  ruby
+
+DEPENDENCIES
+  optimist
+  serialport
+
+BUNDLED WITH
+   2.1.2
