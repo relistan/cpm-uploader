@@ -6,8 +6,9 @@ serial port. It assumes Unix/Linux behavior, so probably doesn't work on
 Windows machines outside of WSL. For Windows you can use Grant Searle's
 binaries [available here](http://searle.x10host.com/cpm/index.html#ROMFiles).
 
-This uses Grant's `DOWNLOAD.COM` program on the CP/M side. The source to that
-is available from the link in the previous paragraph. 
+This uses Grant's `DOWNLOAD.COM` program on the CP/M side. If you do not have
+this pre-installed, you may find a CP/M binary in this repo in the `3rdparty/`
+directory. This version is slightly modified, but either will work.
 
 If you are running an RC2014 and using Spencer's original distribution of CP/M
 on CompactFlash, then the default location of `DOWNLOAD.COM` will work for you.
