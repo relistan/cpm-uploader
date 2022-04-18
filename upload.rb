@@ -2,16 +2,16 @@
 
 # This tool is used to upload files to CP/M machines attached to the serial
 # port. It assumes you are already in CP/M and in the path where you want to
-# upload the file.
+# upload the file. Relies on hardware flow control. The CP/M side is assumed
+# to be Grant Searle's DOWNLOAD.COM utility.
 #
 # Karl Matthias -- April 2022
 
 require 'optimist'
 require 'serialport'
 
-READ_BLOCK_SIZE = 30
+READ_BLOCK_SIZE = 5
 DEFAULT_DEVICE = '/dev/cu.usbserial-FTDOMLSO'
-SEND_DELAY = 0.03 # Seconds
 
 opts = Optimist::options do
   opt :download_path, 'Path to DOWNLOAD.COM on CP/M', type: :string, default: 'A:DOWNLOAD'
@@ -19,6 +19,14 @@ opts = Optimist::options do
   opt :user, 'The CP/M user ID to upload to', type: :integer, default: 0
   opt :port, 'The path to the serial port', type: :string, default: DEFAULT_DEVICE
   opt :serial_speed, 'Serial port speed', type: :int, default: 115200
+end
+
+def sanitize_cpm_filename(filename)
+  File.basename(filename).upcase.gsub(/[^A-Z0-9\-.]*/, '')
+end
+
+def to_hex(int)
+  int.to_s(16).rjust(2, '0').upcase
 end
 
 # Output everything to the tty that we get from the serial port
@@ -38,7 +46,6 @@ end
 
 def port_write(port, buf)
   port.write(buf)
-  sleep(SEND_DELAY) # Make sure not to overrun serial buffer
 end
 
 unless File.exists?(opts[:file])
@@ -57,13 +64,17 @@ byte_count = 0
 
 # Set up the serial port
 port = SerialPort.new(opts[:port], opts[:serial_speed], 8, 1, SerialPort::NONE)
+port.flow_control = SerialPort::HARD
 
 # Open tty for output
 tty = open('/dev/tty', 'r+')
 follow_tty(tty, port)
 
 # Output the header
-port_write(port, "\n#{opts[:download_path]} #{opts[:file].upcase}\nU#{opts[:user]}\n:")
+cpm_filename = sanitize_cpm_filename(opts[:file])
+port_write(port, "\n#{opts[:download_path]} #{cpm_filename}\nU#{opts[:user]}\n:")
+
+count = 0
 
 # Process the file
 while (buf = infile.read(READ_BLOCK_SIZE)) do
@@ -75,7 +86,7 @@ while (buf = infile.read(READ_BLOCK_SIZE)) do
 end
 
 # Output the closing statement
-port.puts ">#{byte_count.to_s(16).upcase}#{checksum.to_s(16).upcase}"
+port.puts ">#{to_hex(byte_count)}#{to_hex(checksum)}"
 
 sleep(0.1) # Just enough time for final output
 infile.close
