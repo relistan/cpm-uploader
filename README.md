@@ -31,6 +31,9 @@ how 99% of terminals will be set, I did not break them out.
 This works great on my macOS machine running at 115200. It works just fine with
 `minicom` running in another terminal as well.
 
+**Note** This assumes that RTS/CTS hardware flow control is available on the
+serial line.
+
 Installation
 ------------
 
@@ -50,6 +53,4 @@ terminal window:
 ./upload.rb --file <file to send>
 ```
 
-You should see the output echoed back from CP/M and then an `OK` at the end. If
-you changed the serial port speed to make it faster than 115200, you may need
-to adjust the `SEND_DELAY` setting at the top of the file to make it longer.
+You should see the output echoed back from CP/M and then an `OK` at the end.
