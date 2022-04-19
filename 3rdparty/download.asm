@@ -70,21 +70,34 @@ WAITLT:	CALL	GETCHR
 	LD	C,PSTRING
 	CALL	BDOS
 
-	LD B,11   ; There are 11 max bytes in the filename
-	LD HL,FCB ; Start from FCB (will be pre-incremented)
-
-
 ; Print out the filename we're using
+	LD IX,FCB ; Start from FCB (will be pre-incremented)
+	LD B,11   ; B starts with 11 bytes (file name length)
+
 PRINTFNAME:
-	INC  HL			; Starting from 1 and then incrementing from there
-	LD   E,(HL)		; Store value at IX into E
+	INC  IX			; Starting from 1 and then incrementing from there
+	
+	; Print a '.' after the ninth byte
+	LD   A, B
+	CP	 3
+	JR   NZ,NODOT
+	LD	 A,'.'		
+	PUSH BC
+	CALL PUTCHR		; Print a dot
+	POP  BC
+NODOT:
+	LD	 A,(IX)
+	CP	 ' '
+	JR	 Z,NOPRINT
+
+	LD   E,A
 	LD   C,CONOUT	; Prepare to call CONOUT in BDOS
 	PUSH BC
-	PUSH HL
 	CALL BDOS		; Call CONOUT
-	POP  HL
 	POP  BC			; Restore some registers
-	DJNZ PRINTFNAME ; Decrement B compare to 0. If ne 0 jump to PRINTFNAME
+NOPRINT:
+	DJNZ PRINTFNAME
+
 	LD   A,"\r"
 	CALL PUTCHR
 	LD   A,"\n"

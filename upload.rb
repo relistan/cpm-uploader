@@ -10,7 +10,7 @@
 require 'optimist'
 require 'serialport'
 
-READ_BLOCK_SIZE = 5
+READ_BLOCK_SIZE = 30
 DEFAULT_DEVICE = '/dev/cu.usbserial-FTDOMLSO'
 
 opts = Optimist::options do
@@ -44,10 +44,6 @@ def follow_tty(tty, port)
   end
 end
 
-def port_write(port, buf)
-  port.write(buf)
-end
-
 unless File.exists?(opts[:file])
   abort "Cannot find file: #{opts[:file]}"
 end
@@ -72,7 +68,7 @@ follow_tty(tty, port)
 
 # Output the header
 cpm_filename = sanitize_cpm_filename(opts[:file])
-port_write(port, "\n#{opts[:download_path]} #{cpm_filename}\nU#{opts[:user]}\n:")
+port.write("\n#{opts[:download_path]} #{cpm_filename}\nU#{opts[:user]}\n:")
 
 count = 0
 
@@ -82,7 +78,7 @@ while (buf = infile.read(READ_BLOCK_SIZE)) do
   byte_count = (byte_count + buf.bytesize) & 0xFF
 
   # Output to the port
-  port_write(port, buf.unpack('H*').flatten.first.upcase)
+  port.write(buf.unpack('H*').flatten.first.upcase)
 end
 
 # Output the closing statement
