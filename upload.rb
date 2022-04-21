@@ -38,11 +38,16 @@ def follow_tty(tty, port)
         tty.putc(port.getc)
       rescue IOError => e
         puts "\nDone"
+        puts '-'*80
         exit 0
       end
     end
   end
 end
+
+puts '-'*80
+puts "                 CP/M Uploader   (using #{opts[:download_path]})"
+puts '-'*80
 
 unless File.exists?(opts[:file])
   abort "Cannot find file: #{opts[:file]}"
@@ -53,6 +58,8 @@ infile = begin
 rescue => e
   abort "Unable to open file '#{opts[:file]}': #{e}"
 end
+
+puts "Uploading #{opts[:file]} — #{File.size(opts[:file])} bytes"
 
 # Initialize some things we track
 checksum = 0
@@ -69,8 +76,6 @@ follow_tty(tty, port)
 # Output the header
 cpm_filename = sanitize_cpm_filename(opts[:file])
 port.write("\n#{opts[:download_path]} #{cpm_filename}\nU#{opts[:user]}\n:")
-
-count = 0
 
 # Process the file
 while (buf = infile.read(READ_BLOCK_SIZE)) do

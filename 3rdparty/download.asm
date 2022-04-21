@@ -78,24 +78,26 @@ PRINTFNAME:
 	INC  IX			; Starting from 1 and then incrementing from there
 	
 	; Print a '.' after the ninth byte
-	LD   A, B
+	LD   A,B
 	CP	 3
-	JR   NZ,NODOT
+	JR   NZ,noDOT
 	LD	 A,'.'		
 	PUSH BC
+	PUSH IX
 	CALL PUTCHR		; Print a dot
+	POP  IX
 	POP  BC
-NODOT:
+noDOT:
 	LD	 A,(IX)
 	CP	 ' '
-	JR	 Z,NOPRINT
+	JR	 Z,noPRINT
 
 	LD   E,A
 	LD   C,CONOUT	; Prepare to call CONOUT in BDOS
 	PUSH BC
 	CALL BDOS		; Call CONOUT
 	POP  BC			; Restore some registers
-NOPRINT:
+noPRINT:
 	DJNZ PRINTFNAME
 
 	LD   A,"\r"
